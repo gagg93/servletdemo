@@ -1,0 +1,7 @@
+<Context>
+
+    <Resource url="jdbc:mysql://localhost:3306/web_student_tracker?useSSL=false&amp;serverTimezone=UTC" driverClassName="com.mysql.cj.jdbc.Driver"
+              password="webstudent" username="webstudent" maxWaitMillis="10000" maxIdle="5" maxTotal="20"
+              type="javax.sql.DataSource" auth="Container" name="jdbc/web_student_tracker"/>
+
+</Context>
