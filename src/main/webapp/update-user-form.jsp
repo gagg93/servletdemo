@@ -16,6 +16,9 @@
 <div id="wrapper">
     <div id="header">
         <h2>Parco Auto</h2>
+        <a href="UserControllerServlet">User</a>
+        <a href="AutoControllerServlet">Auto</a>
+        <a href="PrenotazioneControllerServlet">Prenotazioni</a>
     </div>
 </div>
 

@@ -45,7 +45,7 @@ public class LogInServlet extends HttpServlet {
             else{
 
                 session.setAttribute("admin",false);
-                request.getRequestDispatcher("user-form.jsp").include(request, response);
+                request.getRequestDispatcher("prenotazioni-list.jsp").include(request, response);
             }
         }
         else{

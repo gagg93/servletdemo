@@ -10,6 +10,9 @@
 <div id="wrapper">
     <div id="header">
         <h2>Parco Auto</h2>
+        <a href="UserControllerServlet">User</a>
+        <a href="AutoControllerServlet">Auto</a>
+        <a href="PrenotazioneControllerServlet">Prenotazioni</a>
     </div>
 </div>
 
@@ -38,6 +41,10 @@
                     <c:param name="command" value="DELETE"/>
                     <c:param name="userId" value="${tempPrenotazione.id}"/>
                 </c:url>
+                <c:url var="prenotazioniLink" value="PrenotazioneControllerServlet">
+                    <c:param name="command" value="USERLIST"/>
+                    <c:param name="userId" value="${tempPrenotazione.id}"/>
+                </c:url>
                 <tr>
                     <td>${tempPrenotazione.username}</td>
                     <td>${tempPrenotazione.getNome()}</td>
@@ -47,6 +54,8 @@
                         <a href="${tempLink}">Update</a>
                         |
                         <a href="${deleteLink}" onclick="if(!(confirm('sei sicuro di cancellare?'))) return false">Delete</a>
+                        |
+                        <a href="${prenotazioniLink}">prenotazioni</a>
                     </td>
                 </tr>
             </c:forEach>

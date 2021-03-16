@@ -49,12 +49,48 @@ public class PrenotazioneControllerServlet extends HttpServlet {
                 case "LOADADD":loadAddPrenotazione(req,resp);break;
                 case "UPDATE":updatePrenotazione(req,resp);break;
                 case "DELETE":deletePrenotazione(req,resp);break;
+                case "USERLIST":loadUserPrenotazioni(req,resp);break;
+                case "APPROVE": approvePrenotazione(req,resp);break;
+                case "DISAPPROVE":disapprovePrenotazione(req,resp);break;
                 default:listPrenotazioni(req, resp);
             }
         } catch (Exception exception) {
             throw new ServletException(exception);
         }
     }
+
+    private void disapprovePrenotazione(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String prenotazioneId=req.getParameter("prenotazioneId");
+        Prenotazione prenotazione=prenotazioneDao.getPrenotazione(prenotazioneId);
+        prenotazione.setApprovata(false);
+        prenotazioneDao.updatePrenotazione(prenotazione);
+        resp.sendRedirect("/PrenotazioneControllerServlet");
+    }
+
+    private void approvePrenotazione(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String prenotazioneId=req.getParameter("prenotazioneId");
+        Prenotazione prenotazione=prenotazioneDao.getPrenotazione(prenotazioneId);
+        prenotazione.setApprovata(true);
+        prenotazioneDao.updatePrenotazione(prenotazione);
+        resp.sendRedirect("/PrenotazioneControllerServlet");
+    }
+
+    private void loadUserPrenotazioni(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        List<Prenotazione> prenotazioni=prenotazioneDao.getPrenotazioni();
+        List<PrenotazioneRefactored> prenotazioneRefactoreds = new ArrayList<PrenotazioneRefactored>();
+        for (Prenotazione var :
+                prenotazioni) {
+            PrenotazioneRefactored prenotazioneRefactored=new PrenotazioneRefactored(var);
+            int i=Integer.valueOf(req.getParameter("userId"));
+            if(var.getUser().getId()==i){
+                prenotazioneRefactoreds.add(prenotazioneRefactored);
+            }
+        }
+        req.setAttribute("PRENOTAZIONI_LIST",prenotazioneRefactoreds);
+        RequestDispatcher dispatcher= req.getRequestDispatcher("/prenotazioni-list.jsp");
+        dispatcher.forward(req,resp);
+    }
+
 
     private void loadAddPrenotazione(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session=req.getSession();
@@ -101,10 +137,9 @@ public class PrenotazioneControllerServlet extends HttpServlet {
         Prenotazione prenotazione=new Prenotazione(req.getParameter("data_di_inizio"),req.getParameter("data_di_fine"), auto, user);
         prenotazione.setApprovata(false);
         prenotazioneDao.savePrenotazione(prenotazione);
-        Set<Prenotazione> prenotazioni;
-        prenotazioni=user.getPrenotazioni();
-        prenotazioni.add(prenotazione);
-        user.setPrenotazioni(prenotazioni);
+        /*List<Prenotazione> prenotazioni;
+        prenotazioni=prenotazioneDao.getPrenotazioneByUserId(user.getId());
+        user.setPrenotazioni(prenotazioni);*/
         listPrenotazioni(req,resp);
     }
 

@@ -38,30 +38,35 @@ public class PrenotazioneDao {
         }
     }
 
-    public Prenotazione getPrenotazioneByUsername(String userName) {
+    public List<Prenotazione> getPrenotazioneByUserId(int userId) {
         Transaction transaction = null;
-        Prenotazione prenotazione=null;
+        List<Prenotazione> prenotazioni=null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // start a transaction
             transaction = session.beginTransaction();
 
             // Obtain an entity using byId() method
 
-            String hql = "FROM User E WHERE E.username = :employee_id";
+            String hql = "FROM Prenotazione E WHERE E.user = :employee_id";
             Query query = session.createQuery(hql);
-            query.setParameter("employee_id",userName);
-            List results = query.list();
-            prenotazione=(Prenotazione) results.get(0);
+            query.setParameter("employee_id",userId);
+            List prenotazionis = query.list();
+            for (Object var :
+                    prenotazionis) {
+                prenotazioni.add((Prenotazione) var);
+            }
+
 
             // commit transaction
             transaction.commit();
+            return prenotazioni;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
             e.printStackTrace();
         }
-        return prenotazione;
+        return prenotazioni;
     }
 
     public void updatePrenotazione(Prenotazione prenotazione) {

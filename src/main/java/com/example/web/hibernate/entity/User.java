@@ -28,17 +28,16 @@ public class User {
     private String data_di_nascita;
     @Column
     boolean admin;
-    @OneToMany
-    @JoinColumn(name = "prenotazioni")
-    Set<Prenotazione> prenotazioni;
+    @OneToMany(mappedBy="user",cascade = CascadeType.ALL, orphanRemoval = true)
+    List<Prenotazione> prenotazioni;
 
 
 
-    public Set<Prenotazione> getPrenotazioni() {
+    public List<Prenotazione> getPrenotazioni() {
        return prenotazioni;
     }
 
-    public void setPrenotazioni(Set<Prenotazione> prenotazioni) {
+    public void setPrenotazioni(List<Prenotazione> prenotazioni) {
         this.prenotazioni = prenotazioni;
     }
 

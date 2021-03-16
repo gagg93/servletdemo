@@ -34,8 +34,7 @@ public class UserControllerServlet extends HttpServlet  {
             if(session!= null){
                 Boolean admin=(Boolean) session.getAttribute("admin");
                 if(!admin){
-                    RequestDispatcher dispatcher=req.getRequestDispatcher("/user-form.jsp");
-                    dispatcher.forward(req,resp);
+                    theCommand="LOAD";
                 }
             }
             if (theCommand==null){
@@ -56,7 +55,13 @@ public class UserControllerServlet extends HttpServlet  {
 
     private void loadUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String userId=req.getParameter("userId");
-        User user= userDao.getUser(userId);
+        User user;
+        if (userId==null){
+            HttpSession session=req.getSession(true);
+            user = userDao.getUserByUsername((String) session.getAttribute("username"));
+        }else{
+            user = userDao.getUser(userId);
+        }
         req.setAttribute("THE_USER", user);
         RequestDispatcher dispatcher=req.getRequestDispatcher("/update-user-form.jsp");
         dispatcher.forward(req,resp);

@@ -10,6 +10,9 @@
 <div id="wrapper">
     <div id="header">
         <h2>Parco Auto</h2>
+        <a href="UserControllerServlet">User</a>
+        <a href="AutoControllerServlet">Auto</a>
+        <a href="PrenotazioneControllerServlet">Prenotazioni</a>
     </div>
 </div>
 
@@ -29,25 +32,46 @@
             </tr>
 
             <c:forEach var="tempPrenotazione" items="${PRENOTAZIONI_LIST}">
-                <c:url var="tempLink" value="PrenotazioneControllerServlet">
-                    <c:param name="command" value="LOAD"/>
-                    <c:param name="prenotazioneId" value="${tempPrenotazione.id}"/>
-                </c:url>
-                <c:url var="deleteLink" value="PrenotazioneControllerServlet">
-                    <c:param name="command" value="DELETE"/>
-                    <c:param name="prenotazioneId" value="${tempPrenotazione.id}"/>
-                </c:url>
+                <c:if test="${!admin}">
+                    <c:url var="tempLink" value="PrenotazioneControllerServlet">
+                        <c:param name="command" value="LOAD"/>
+                        <c:param name="prenotazioneId" value="${tempPrenotazione.id}"/>
+                    </c:url>
+                    <c:url var="deleteLink" value="PrenotazioneControllerServlet">
+                        <c:param name="command" value="DELETE"/>
+                        <c:param name="prenotazioneId" value="${tempPrenotazione.id}"/>
+                    </c:url>
+                </c:if>
+                <c:if test="${admin}">
+                    <c:url var="approveLink" value="PrenotazioneControllerServlet">
+                        <c:param name="command" value="APPROVE"/>
+                        <c:param name="prenotazioneId" value="${tempPrenotazione.id}"/>
+                    </c:url>
+                    <c:url var="disapproveLink" value="PrenotazioneControllerServlet">
+                        <c:param name="command" value="DISAPPROVE"/>
+                        <c:param name="prenotazioneId" value="${tempPrenotazione.id}"/>
+                    </c:url>
+                </c:if>
                 <tr>
                     <td>${tempPrenotazione.username}</td>
                     <td>${tempPrenotazione.targa}</td>
                     <td>${tempPrenotazione.data_di_inizio}</td>
                     <td>${tempPrenotazione.data_di_fine}</td>
                     <td>${tempPrenotazione.approvata}</td>
+                    <c:if test="${!admin}">
                     <td>
                         <a href="${tempLink}">Update</a>
                         |
                         <a href="${deleteLink}" onclick="if(!(confirm('sei sicuro di cancellare?'))) return false">Delete</a>
                     </td>
+                    </c:if>
+                    <c:if test="${admin}">
+                        <td>
+                            <a href="${approveLink}" onclick="if(!(confirm('sei sicuro di approvare?'))) return false">Approva</a>
+                            |
+                            <a href="${disapproveLink}" onclick="if(!(confirm('sei sicuro di disapprovare?'))) return false">Disapprova</a>
+                        </td>
+                    </c:if>
                 </tr>
             </c:forEach>
         </table>
