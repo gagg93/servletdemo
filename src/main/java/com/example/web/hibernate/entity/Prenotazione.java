@@ -2,6 +2,7 @@ package com.example.web.hibernate.entity;
 
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table
@@ -13,9 +14,11 @@ public class Prenotazione {
     @Column
     Boolean approvata;
     @Column
-    String data_di_inizio;
+    @Temporal(TemporalType.DATE)
+    Date data_di_inizio;
     @Column
-    String data_di_fine;
+    @Temporal(TemporalType.DATE)
+    Date data_di_fine;
     @ManyToOne(targetEntity = Auto.class)
     Auto auto;
     @ManyToOne
@@ -23,7 +26,7 @@ public class Prenotazione {
     User user;
 
 
-    public Prenotazione(String data_di_inizio, String data_di_fine, Auto auto, User user) {
+    public Prenotazione(Date data_di_inizio, Date data_di_fine, Auto auto, User user) {
         this.data_di_inizio = data_di_inizio;
         this.data_di_fine = data_di_fine;
         this.auto = auto;
@@ -44,19 +47,19 @@ public class Prenotazione {
         this.approvata = approvata;
     }
 
-    public String getData_di_inizio() {
+    public Date getData_di_inizio() {
         return data_di_inizio;
     }
 
-    public void setData_di_inizio(String data_di_inizio) {
+    public void setData_di_inizio(Date data_di_inizio) {
         this.data_di_inizio = data_di_inizio;
     }
 
-    public String getData_di_fine() {
+    public Date getData_di_fine() {
         return data_di_fine;
     }
 
-    public void setData_di_fine(String data_di_fine) {
+    public void setData_di_fine(Date data_di_fine) {
         this.data_di_fine = data_di_fine;
     }
 

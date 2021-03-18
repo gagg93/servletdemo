@@ -7,6 +7,9 @@ import com.example.web.hibernate.Dao.UserDao;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -45,7 +48,7 @@ public class LogInServlet extends HttpServlet {
             else{
 
                 session.setAttribute("admin",false);
-                request.getRequestDispatcher("prenotazioni-list.jsp").include(request, response);
+                response.sendRedirect("/PrenotazioneControllerServlet");
             }
         }
         else{
@@ -58,8 +61,15 @@ public class LogInServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        userDao.saveUser(new User("admin","admin"," "," "," ",true));
-        userDao.saveUser(new User("gagg","admin"," "," "," ",false));
+        SimpleDateFormat data = new SimpleDateFormat("dd-MM-yyyy");
+        Date data1= null;
+        try {
+            data1= data.parse("23-03-1993");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        userDao.saveUser(new User("admin","admin","admin","admin", data1,true));
+        userDao.saveUser(new User("gagg","admin","lorenzo","gaggero", data1,false));
         autoDao.saveAuto(new Auto("honda","civic",0,"da907ve","berlina"));
 
     }

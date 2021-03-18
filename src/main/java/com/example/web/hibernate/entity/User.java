@@ -1,12 +1,7 @@
 package com.example.web.hibernate.entity;
 
-import com.example.web.hibernate.util.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.query.Query;
-import org.jetbrains.annotations.NotNull;
-
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -25,10 +20,11 @@ public class User {
     @Column
     private String cognome;
     @Column
-    private String data_di_nascita;
+    @Temporal(TemporalType.DATE)
+    private Date data_di_nascita;
     @Column
     boolean admin;
-    @OneToMany(mappedBy="user",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy="user",fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
     List<Prenotazione> prenotazioni;
 
 
@@ -89,18 +85,18 @@ public class User {
         this.cognome = cognome;
     }
 
-    public String getData_di_nascita() {
+    public Date getData_di_nascita() {
         return data_di_nascita;
     }
 
-    public void setData_di_nascita(String data_di_nascita) {
+    public void setData_di_nascita(Date data_di_nascita) {
         this.data_di_nascita = data_di_nascita;
     }
 
     public User() {
     }
 
-    public User(String username, String password, String nome, String cognome, String data_di_nascita,boolean admin) {
+    public User(String username, String password, String nome, String cognome, Date data_di_nascita, boolean admin) {
         this.username = username;
         this.password = password;
         this.nome = nome;

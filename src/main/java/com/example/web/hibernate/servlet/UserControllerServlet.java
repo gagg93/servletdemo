@@ -14,6 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @WebServlet("/UserControllerServlet")
@@ -46,11 +50,36 @@ public class UserControllerServlet extends HttpServlet  {
                 case "LOAD":loadUser(req,resp);break;
                 case "UPDATE":updateUser(req,resp);break;
                 case "DELETE":deleteUser(req,resp);break;
+                case "RESEARCH":researchUser(req,resp);break;
                 default:listUsers(req, resp);
             }
         } catch (Exception exception) {
             throw new ServletException(exception);
         }
+    }
+
+    private void researchUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        List<User> users = new ArrayList<>();
+
+        RequestDispatcher dispatcher= req.getRequestDispatcher("/user-list.jsp");
+
+
+        switch (req.getParameter("researchField")){
+            case "Username":{
+                User user=userDao.getUserByUsername(req.getParameter("key"));
+                users.add(user);
+            }break;
+            case "Nome":users=userDao.getUserByNome(req.getParameter("key"));break;
+            case "Cognome":users=userDao.getUserByCognome(req.getParameter("key"));break;
+            case "Data di nascita":users=userDao.getUserByData(req.getParameter("key"));break;
+            default:users=userDao.getUsers();
+        }
+        req.setAttribute("USER_LIST",users);
+        dispatcher.forward(req,resp);
+    }
+
+    private void researchUserByUsername(HttpServletRequest req, HttpServletResponse resp) {
+
     }
 
     private void loadUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -70,14 +99,26 @@ public class UserControllerServlet extends HttpServlet  {
 
 
     private void updateUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        User user=new User(req.getParameter("username"),req.getParameter("password"), req.getParameter("nome"), req.getParameter("cognome"), req.getParameter("data"), false);
-        user.setId(Integer.parseInt(req.getParameter("userId")));
-        userDao.updateUser(user);
+        SimpleDateFormat data = new SimpleDateFormat();
+        User user=null;
+        try {
+            user = new User(req.getParameter("username"), req.getParameter("password"), req.getParameter("nome"), req.getParameter("cognome"), data.parse(req.getParameter("data")), false);
+            user.setId(Integer.parseInt(req.getParameter("userId")));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if(user!=null&&user.getUsername().trim()!=null&&user.getNome().trim()!=null&&user.getCognome().trim()!=null&&user.getData_di_nascita()!=null) {
+            userDao.updateUser(user);
+        }else{
+            RequestDispatcher dispatcher= req.getRequestDispatcher("/error-page.jsp");
+            dispatcher.forward(req,resp);
+        }
         listUsers(req,resp);
     }
 
     private void deleteUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        User user=new User(req.getParameter("username"),req.getParameter("password"), req.getParameter("nome"), req.getParameter("cognome"), req.getParameter("data"), false);
+        SimpleDateFormat data = new SimpleDateFormat();
+        User user=new User(req.getParameter("username"),req.getParameter("password"), req.getParameter("nome"), req.getParameter("cognome"), data.parse(req.getParameter("data")), false);
         user.setId(Integer.parseInt(req.getParameter("userId")));
         userDao.deleteUser(user);
         listUsers(req,resp);
@@ -85,10 +126,18 @@ public class UserControllerServlet extends HttpServlet  {
     }
 
     private void addUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        User user=new User(req.getParameter("username"),req.getParameter("password"), req.getParameter("nome"), req.getParameter("cognome"), req.getParameter("data"), false);
-        Boolean unique=(userDao.getUserByUsername(user.getUsername())==null);
-        if(unique){
-            userDao.saveUser(user);
+        SimpleDateFormat data = new SimpleDateFormat("dd-MM-yyyy");
+        User user=null;
+        try {
+            user = new User(req.getParameter("username"), req.getParameter("password"), req.getParameter("nome"), req.getParameter("cognome"), data.parse(req.getParameter("data")), false);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if(user!=null&&user.getUsername().trim()!=null&&user.getNome().trim()!=null&&user.getCognome().trim()!=null&&user.getData_di_nascita()!=null&&userDao.getUserByUsername(user.getUsername()) == null) {
+                userDao.saveUser(user);
+        }else{
+            RequestDispatcher dispatcher= req.getRequestDispatcher("/error-page.jsp");
+            dispatcher.forward(req,resp);
         }
         resp.sendRedirect("/UserControllerServlet");
     }

@@ -44,7 +44,7 @@ public class UserDao {
         }
     }
 
-    public User getUserByUsername(String userName) {
+    public User getUserByUsername(String username) {
         Transaction transaction = null;
         User user=null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -53,9 +53,9 @@ public class UserDao {
 
             // Obtain an entity using byId() method
 
-            String hql = "FROM User E WHERE E.username = :employee_id";
+            String hql = "FROM User E WHERE E.username = :user_id";
             Query query = session.createQuery(hql);
-            query.setParameter("employee_id",userName);
+            query.setParameter("user_id",username);
             List results = query.list();
             if(!results.isEmpty()) {
                 user = (User) results.get(0);
@@ -116,7 +116,8 @@ public class UserDao {
 
 
                 // Obtain an entity using byId() method
-                user = session.byId(User.class).getReference(Integer.valueOf(userId));
+                user=(User) session.get(User.class,Integer.parseInt(userId));
+                //user = session.byId(User.class).getReference(Integer.valueOf(userId));
                 System.out.println(user.getUsername());
                 System.out.println(user.getData_di_nascita());
                 // commit transaction
@@ -129,4 +130,79 @@ public class UserDao {
             }
             return user;
         }
+
+    public List<User> getUserByNome(String key) {
+        Transaction transaction = null;
+        List<User> users=null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // start a transaction
+            transaction = session.beginTransaction();
+
+            // Obtain an entity using byId() method
+
+            String hql = "FROM User E WHERE E.nome = :nome";
+            Query query = session.createQuery(hql);
+            query.setParameter("nome",key);
+            users = query.list();
+
+            // commit transaction
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    public List<User> getUserByCognome(String key) {
+        Transaction transaction = null;
+        List<User> users=null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // start a transaction
+            transaction = session.beginTransaction();
+
+            // Obtain an entity using byId() method
+
+            String hql = "FROM User E WHERE E.cognome = :cognome";
+            Query query = session.createQuery(hql);
+            query.setParameter("cognome",key);
+            users = query.list();
+
+            // commit transaction
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    public List<User> getUserByData(String key) {
+        Transaction transaction = null;
+        List<User> users=null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // start a transaction
+            transaction = session.beginTransaction();
+
+            // Obtain an entity using byId() method
+
+            String hql = "FROM User E WHERE E.data_di_nascita = :Data";
+            Query query = session.createQuery(hql);
+            query.setParameter("Data",key);
+            users = query.list();
+
+            // commit transaction
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+        return users;
+    }
 }

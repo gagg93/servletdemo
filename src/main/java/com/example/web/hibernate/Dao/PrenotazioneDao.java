@@ -9,6 +9,7 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import javax.persistence.TypedQuery;
+import java.util.Date;
 import java.util.List;
 
 public class PrenotazioneDao {
@@ -38,7 +39,7 @@ public class PrenotazioneDao {
         }
     }
 
-    public List<Prenotazione> getPrenotazioneByUserId(int userId) {
+    public List<Prenotazione> getPrenotazioniByUserId(int userId) {
         Transaction transaction = null;
         List<Prenotazione> prenotazioni=null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -47,19 +48,37 @@ public class PrenotazioneDao {
 
             // Obtain an entity using byId() method
 
-            String hql = "FROM Prenotazione E WHERE E.user = :employee_id";
-            Query query = session.createQuery(hql);
-            query.setParameter("employee_id",userId);
-            List prenotazionis = query.list();
-            for (Object var :
-                    prenotazionis) {
-                prenotazioni.add((Prenotazione) var);
-            }
-
+            User user=(User) session.get(User.class,userId);
+            prenotazioni=user.getPrenotazioni();
 
             // commit transaction
             transaction.commit();
             return prenotazioni;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+        return prenotazioni;
+    }
+
+    public List<Prenotazione> getPrenotazioniByTarga(Auto auto) {
+        Transaction transaction = null;
+        List<Prenotazione> prenotazioni=null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // start a transaction
+            transaction = session.beginTransaction();
+
+            // Obtain an entity using byId() method
+
+            String hql = "FROM Prenotazione E WHERE E.auto = :autoId";
+            Query query = session.createQuery(hql);
+            query.setParameter("autoId",auto );
+            prenotazioni = query.list();
+
+            // commit transaction
+            transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
@@ -125,6 +144,56 @@ public class PrenotazioneDao {
             e.printStackTrace();
         }
         return prenotazione;
+    }
+
+    public List<Prenotazione> getPrenotazioniByDataDiInizio(Date key) {
+        Transaction transaction = null;
+        List<Prenotazione> prenotazioni=null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // start a transaction
+            transaction = session.beginTransaction();
+
+            // Obtain an entity using byId() method
+
+            String hql = "FROM Prenotazione E WHERE E.data_di_inizio = :data";
+            Query query = session.createQuery(hql);
+            query.setParameter("data",key );
+            prenotazioni = query.list();
+
+            // commit transaction
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+        return prenotazioni;
+    }
+
+    public List<Prenotazione> getPrenotazioniByDataDiFine(Date key) {
+        Transaction transaction = null;
+        List<Prenotazione> prenotazioni=null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // start a transaction
+            transaction = session.beginTransaction();
+
+            // Obtain an entity using byId() method
+
+            String hql = "FROM Prenotazione E WHERE E.data_di_fine = :data";
+            Query query = session.createQuery(hql);
+            query.setParameter("data",key );
+            prenotazioni = query.list();
+
+            // commit transaction
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+        return prenotazioni;
     }
 }
 

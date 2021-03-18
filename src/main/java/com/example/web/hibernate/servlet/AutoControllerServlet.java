@@ -79,7 +79,12 @@ public class AutoControllerServlet extends HttpServlet {
         Boolean unique=(autoDao.getAutoByTarga(auto.getTarga())==null);
         if(unique){
             autoDao.saveAuto(auto);
+        }else{
+            RequestDispatcher dispatcher=req.getRequestDispatcher("/error-page.jsp");
+            dispatcher.forward(req,resp);
+            return;
         }
+
         listAutos(req,resp);
     }
 

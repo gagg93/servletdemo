@@ -21,8 +21,21 @@
 <div id="container">
     <div id="content">
 
-        <input type="button" value="Add Customer" onclick="window.location.href='user-form.jsp'; return false"><br>
+        <input type="button" value="Add Customer" onclick="window.location.href='user-form.jsp'; return false"><br><br>
+        <form action="UserControllerServlet"method="get">
+            <input type="hidden" name="command" value="RESEARCH"/>
+            <select name="researchField" id="researchField">
+                <option>Username</option>
+                <option>Nome</option>
+                <option>Cognome</option>
+                <option>Data di nascita</option>
 
+            </select>
+            <input type="text" name="key">
+            <td><input type="submit" value="Ricerca" class="save"/></td>
+
+        </form>
+        <br><br>
         <table>
             <tr>
                 <th>Username</th>
@@ -32,24 +45,24 @@
                 <th>Action</th>
             </tr>
 
-            <c:forEach var="tempPrenotazione" items="${USER_LIST}">
+            <c:forEach var="tempUser" items="${USER_LIST}">
                 <c:url var="tempLink" value="UserControllerServlet">
                     <c:param name="command" value="LOAD"/>
-                    <c:param name="userId" value="${tempPrenotazione.id}"/>
+                    <c:param name="userId" value="${tempUser.id}"/>
                 </c:url>
                 <c:url var="deleteLink" value="UserControllerServlet">
                     <c:param name="command" value="DELETE"/>
-                    <c:param name="userId" value="${tempPrenotazione.id}"/>
+                    <c:param name="userId" value="${tempUser.id}"/>
                 </c:url>
                 <c:url var="prenotazioniLink" value="PrenotazioneControllerServlet">
                     <c:param name="command" value="USERLIST"/>
-                    <c:param name="userId" value="${tempPrenotazione.id}"/>
+                    <c:param name="userId" value="${tempUser.id}"/>
                 </c:url>
                 <tr>
-                    <td>${tempPrenotazione.username}</td>
-                    <td>${tempPrenotazione.getNome()}</td>
-                    <td>${tempPrenotazione.getCognome()}</td>
-                    <td>${tempPrenotazione.getData_di_nascita()}</td>
+                    <td>${tempUser.username}</td>
+                    <td>${tempUser.getNome()}</td>
+                    <td>${tempUser.getCognome()}</td>
+                    <td>${tempUser.getData_di_nascita()}</td>
                     <td>
                         <a href="${tempLink}">Update</a>
                         |

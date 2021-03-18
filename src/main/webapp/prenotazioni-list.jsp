@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <html>
 <head>
     <title>AppParco Auto</title>
@@ -20,6 +21,20 @@
 
 <div id="container">
     <div id="content">
+        <form action="PrenotazioneControllerServlet"method="get">
+            <input type="hidden" name="command" value="RESEARCH"/>
+            <select name="researchField" id="researchField">
+                <option>Username</option>
+                <option>Targa</option>
+                <option>Data di inizio</option>
+                <option>Data di fine</option>
+
+            </select>
+            <input type="text" name="key">
+            <td><input type="submit" value="Ricerca" class="save"/></td>
+
+        </form>
+        <br><br>
 
         <table>
             <tr>
@@ -33,10 +48,10 @@
 
             <c:forEach var="tempPrenotazione" items="${PRENOTAZIONI_LIST}">
                 <c:if test="${!admin}">
-                    <c:url var="tempLink" value="PrenotazioneControllerServlet">
-                        <c:param name="command" value="LOAD"/>
-                        <c:param name="prenotazioneId" value="${tempPrenotazione.id}"/>
-                    </c:url>
+                        <c:url var="tempLink" value="PrenotazioneControllerServlet">
+                            <c:param name="command" value="LOAD"/>
+                            <c:param name="prenotazioneId" value="${tempPrenotazione.id}"/>
+                        </c:url>
                     <c:url var="deleteLink" value="PrenotazioneControllerServlet">
                         <c:param name="command" value="DELETE"/>
                         <c:param name="prenotazioneId" value="${tempPrenotazione.id}"/>
@@ -60,7 +75,7 @@
                     <td>${tempPrenotazione.approvata}</td>
                     <c:if test="${!admin}">
                     <td>
-                        <a href="${tempLink}">Update</a>
+                        <a href="${tempLink}" onclick="">Update</a>
                         |
                         <a href="${deleteLink}" onclick="if(!(confirm('sei sicuro di cancellare?'))) return false">Delete</a>
                     </td>
