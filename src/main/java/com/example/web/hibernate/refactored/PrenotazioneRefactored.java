@@ -3,22 +3,21 @@ package com.example.web.hibernate.refactored;
 
 import com.example.web.hibernate.entity.Prenotazione;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PrenotazioneRefactored {
     private int id;
     private Boolean approvata;
-    private Date data_di_inizio;
-    private Date data_di_fine;
+    private Date dataDiInizio;
+    private Date dataDiFine;
     private String targa;
     private String username;
 
     public PrenotazioneRefactored(@org.jetbrains.annotations.NotNull Prenotazione prenotazione){
         this.id = prenotazione.getId();
         this.approvata = prenotazione.getApprovata();
-        this.data_di_inizio=prenotazione.getData_di_inizio();
-        this.data_di_fine = prenotazione.getData_di_fine();
+        this.dataDiInizio =prenotazione.getDataDiInizio();
+        this.dataDiFine = prenotazione.getDataDiFine();
         this.targa= prenotazione.getAuto().getTarga();
         this.username=prenotazione.getUser().getUsername();
     }
@@ -41,20 +40,20 @@ public class PrenotazioneRefactored {
         this.approvata = approvata;
     }
 
-    public Date getData_di_inizio() {
-        return data_di_inizio;
+    public Date getDataDiInizio() {
+        return dataDiInizio;
     }
 
-    public void setData_di_inizio(Date data_di_inizio) {
-        this.data_di_inizio = data_di_inizio;
+    public void setDataDiInizio(Date dataDiInizio) {
+        this.dataDiInizio = dataDiInizio;
     }
 
-    public Date getData_di_fine() {
-        return data_di_fine;
+    public Date getDataDiFine() {
+        return dataDiFine;
     }
 
-    public void setData_di_fine(Date data_di_fine) {
-        this.data_di_fine = data_di_fine;
+    public void setDataDiFine(Date dataDiFine) {
+        this.dataDiFine = dataDiFine;
     }
 
     public String getTarga() {

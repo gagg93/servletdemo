@@ -21,7 +21,10 @@
 <div id="container">
     <div id="content">
 
-        <input type="button" value="Add Auto" onclick="window.location.href='auto-form.jsp'; return false"><br>
+        <form action="AutoControllerServlet"method="get">
+            <input type="hidden" name="command" value="LOAD"/>
+            <input type="submit" value="Add Auto" class="save"><br><br>
+        </form>
 
         <table>
             <tr>

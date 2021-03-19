@@ -15,10 +15,10 @@ public class Prenotazione {
     Boolean approvata;
     @Column
     @Temporal(TemporalType.DATE)
-    Date data_di_inizio;
+    Date dataDiInizio;
     @Column
     @Temporal(TemporalType.DATE)
-    Date data_di_fine;
+    Date dataDiFine;
     @ManyToOne(targetEntity = Auto.class)
     Auto auto;
     @ManyToOne
@@ -26,9 +26,9 @@ public class Prenotazione {
     User user;
 
 
-    public Prenotazione(Date data_di_inizio, Date data_di_fine, Auto auto, User user) {
-        this.data_di_inizio = data_di_inizio;
-        this.data_di_fine = data_di_fine;
+    public Prenotazione(Date dataDiInizio, Date dataDiFine, Auto auto, User user) {
+        this.dataDiInizio = dataDiInizio;
+        this.dataDiFine = dataDiFine;
         this.auto = auto;
         this.user = user;
     }
@@ -47,20 +47,20 @@ public class Prenotazione {
         this.approvata = approvata;
     }
 
-    public Date getData_di_inizio() {
-        return data_di_inizio;
+    public Date getDataDiInizio() {
+        return dataDiInizio;
     }
 
-    public void setData_di_inizio(Date data_di_inizio) {
-        this.data_di_inizio = data_di_inizio;
+    public void setDataDiInizio(Date data_di_inizio) {
+        this.dataDiInizio = data_di_inizio;
     }
 
-    public Date getData_di_fine() {
-        return data_di_fine;
+    public Date getDataDiFine() {
+        return dataDiFine;
     }
 
-    public void setData_di_fine(Date data_di_fine) {
-        this.data_di_fine = data_di_fine;
+    public void setDataDiFine(Date data_di_fine) {
+        this.dataDiFine = data_di_fine;
     }
 
     public Auto getAuto() {

@@ -8,6 +8,8 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class UserDao {
@@ -16,19 +18,11 @@ public class UserDao {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // start a transaction
             transaction = session.beginTransaction();
-            // save the student object
-            /*List<User> users = this.getUsers();
-            List<String> usernames=null;
-            if(users!=null) {
-                for (User var :
-                        users) {
-                    usernames.add(var.getUsername());
-                }
-                if (!usernames.contains(user.getUsername())) {
-                    session.save(user);
-                }
-            }*/
-            session.save(user);
+            if (user.getId()==0){
+                session.save(user);
+            }else{
+                session.update(user);
+            }
             // commit transaction
             transaction.commit();
         } catch (Exception e) {
@@ -71,29 +65,12 @@ public class UserDao {
         return user;
     }
 
-    public void updateUser(User user) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // start a transaction
-            transaction = session.beginTransaction();
-            // save the student object
-            session.update(user);
-            // commit transaction
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
 
     public void deleteUser(User user) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // start a transaction
             transaction = session.beginTransaction();
-            // save the student object
             session.delete(user);
             // commit transaction
             transaction.commit();
@@ -113,14 +90,9 @@ public class UserDao {
                 // start a transaction
                 transaction = session.beginTransaction();
 
-
-
-                // Obtain an entity using byId() method
                 user=(User) session.get(User.class,Integer.parseInt(userId));
-                //user = session.byId(User.class).getReference(Integer.valueOf(userId));
                 System.out.println(user.getUsername());
-                System.out.println(user.getData_di_nascita());
-                // commit transaction
+                System.out.println(user.getDataDiNascita());
                 transaction.commit();
             } catch (Exception e) {
                 if (transaction != null) {
@@ -131,18 +103,32 @@ public class UserDao {
             return user;
         }
 
-    public List<User> getUserByNome(String key) {
+    public List<User> getUserByField(String key, String researchField) {
         Transaction transaction = null;
         List<User> users=null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // start a transaction
             transaction = session.beginTransaction();
 
-            // Obtain an entity using byId() method
+            String hql;
+            switch (researchField){
+                case "Username":hql = "FROM User E WHERE E.username LIKE :key";break;
+                case "Nome":hql = "FROM User E WHERE E.nome LIKE :key";break;
+                case "Cognome":hql = "FROM User E WHERE E.cognome LIKE :key";break;
+                case "Data di nascita":{
 
-            String hql = "FROM User E WHERE E.nome = :nome";
+                    hql = "FROM User E WHERE E.dataDiNascita = :key";
+                };break;
+                default:hql="FROM User E";
+            }
+
             Query query = session.createQuery(hql);
-            query.setParameter("nome",key);
+            if(researchField.equals("Data di nascita")){
+                SimpleDateFormat data = new SimpleDateFormat("dd-MM-yyyy");
+                Date date=data.parse(key);
+                query.setParameter("key", date );
+            }else{
+                query.setParameter("key", "%" + key + "%");
+            }
             users = query.list();
 
             // commit transaction
@@ -156,53 +142,4 @@ public class UserDao {
         return users;
     }
 
-    public List<User> getUserByCognome(String key) {
-        Transaction transaction = null;
-        List<User> users=null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // start a transaction
-            transaction = session.beginTransaction();
-
-            // Obtain an entity using byId() method
-
-            String hql = "FROM User E WHERE E.cognome = :cognome";
-            Query query = session.createQuery(hql);
-            query.setParameter("cognome",key);
-            users = query.list();
-
-            // commit transaction
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-        return users;
-    }
-
-    public List<User> getUserByData(String key) {
-        Transaction transaction = null;
-        List<User> users=null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // start a transaction
-            transaction = session.beginTransaction();
-
-            // Obtain an entity using byId() method
-
-            String hql = "FROM User E WHERE E.data_di_nascita = :Data";
-            Query query = session.createQuery(hql);
-            query.setParameter("Data",key);
-            users = query.list();
-
-            // commit transaction
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-        return users;
-    }
 }

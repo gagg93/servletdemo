@@ -70,8 +70,8 @@
                 <tr>
                     <td>${tempPrenotazione.username}</td>
                     <td>${tempPrenotazione.targa}</td>
-                    <td>${tempPrenotazione.data_di_inizio}</td>
-                    <td>${tempPrenotazione.data_di_fine}</td>
+                    <td>${tempPrenotazione.dataDiInizio}</td>
+                    <td>${tempPrenotazione.dataDiFine}</td>
                     <td>${tempPrenotazione.approvata}</td>
                     <c:if test="${!admin}">
                     <td>

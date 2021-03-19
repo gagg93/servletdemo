@@ -2,7 +2,7 @@ package com.example.web.hibernate.servlet;
 
 import com.example.web.hibernate.Dao.AutoDao;
 import com.example.web.hibernate.entity.Auto;
-import com.example.web.hibernate.entity.User;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -22,7 +22,7 @@ public class AutoControllerServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         try {
             String theCommand=req.getParameter("command");
             HttpSession session=req.getSession(false);
@@ -48,20 +48,14 @@ public class AutoControllerServlet extends HttpServlet {
         }
     }
 
-    private void loadAuto(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String autoId=req.getParameter("autoId");
-        Auto auto= autoDao.getAuto(autoId);
-        req.setAttribute("THE_AUTO", auto);
-        RequestDispatcher dispatcher=req.getRequestDispatcher("/update-auto-form.jsp");
-        dispatcher.forward(req,resp);
-    }
+
 
 
 
     private void updateAuto(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Auto auto=new Auto(req.getParameter("casaCostruttrice"),req.getParameter("modello"), Integer.parseInt(req.getParameter("annoImmatricolazione")), req.getParameter("targa"), req.getParameter("tipologia"));
         auto.setId(Integer.parseInt(req.getParameter("autoId")));
-        autoDao.updateAuto(auto);
+        autoDao.saveAuto(auto);
         listAutos(req,resp);
     }
 
@@ -71,6 +65,19 @@ public class AutoControllerServlet extends HttpServlet {
         autoDao.deleteAuto(auto);
         listAutos(req,resp);
 
+    }
+
+    private void loadAuto(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String autoId=req.getParameter("autoId");
+        Auto auto;
+        if(autoId==null){
+            auto=new Auto();
+        }else {
+            auto = autoDao.getAuto(autoId);
+        }
+        req.setAttribute("THE_AUTO", auto);
+        RequestDispatcher dispatcher=req.getRequestDispatcher("/update-auto-form.jsp");
+        dispatcher.forward(req,resp);
     }
 
     private void addAuto(HttpServletRequest req, HttpServletResponse resp) throws Exception {

@@ -17,8 +17,11 @@ public class AutoDao {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // start a transaction
             transaction = session.beginTransaction();
-            // save the student object
-            session.save(auto);
+            if(auto.getId()== 0) {
+                session.save(auto);
+            }else{
+                session.update(auto);
+            }
             // commit transaction
             transaction.commit();
         } catch (Exception e) {
@@ -28,6 +31,7 @@ public class AutoDao {
             e.printStackTrace();
         }
     }
+
     public List<Auto> getAutos() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("FROM Auto", Auto.class).list();
@@ -41,7 +45,6 @@ public class AutoDao {
             // start a transaction
             transaction = session.beginTransaction();
 
-            // Obtain an entity using byId() method
 
             String hql = "FROM Auto E WHERE E.targa = :targa";
             Query query = session.createQuery(hql);
@@ -62,29 +65,13 @@ public class AutoDao {
         return auto;
     }
 
-    public void updateAuto(Auto auto) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // start a transaction
-            transaction = session.beginTransaction();
-            // save the student object
-            session.update(auto);
-            // commit transaction
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
+
 
     public void deleteAuto(Auto auto) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // start a transaction
             transaction = session.beginTransaction();
-            // save the student object
             session.delete(auto);
             // commit transaction
             transaction.commit();
@@ -99,7 +86,7 @@ public class AutoDao {
 
     public Auto getAuto(String autoId) {
         Transaction transaction = null;
-        Auto auto=null;
+        Auto auto;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // start a transaction
             transaction = session.beginTransaction();
@@ -107,8 +94,7 @@ public class AutoDao {
 
 
             // Obtain an entity using byId() method
-            auto=(Auto) session.get(Auto.class,Integer.parseInt(autoId));
-            //auto = session.byId(Auto.class).getReference(Integer.parseInt(autoId));
+            auto= session.get(Auto.class,Integer.parseInt(autoId));
             System.out.println(auto);
             // commit transaction
             transaction.commit();

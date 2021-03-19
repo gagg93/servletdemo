@@ -20,8 +20,10 @@
 
 <div id="container">
     <div id="content">
-
-        <input type="button" value="Add Customer" onclick="window.location.href='user-form.jsp'; return false"><br><br>
+        <form action="UserControllerServlet"method="get">
+            <input type="hidden" name="command" value="LOAD"/>
+            <input type="submit" value="Add Customer" class="save"><br><br>
+        </form>
         <form action="UserControllerServlet"method="get">
             <input type="hidden" name="command" value="RESEARCH"/>
             <select name="researchField" id="researchField">
@@ -62,7 +64,7 @@
                     <td>${tempUser.username}</td>
                     <td>${tempUser.getNome()}</td>
                     <td>${tempUser.getCognome()}</td>
-                    <td>${tempUser.getData_di_nascita()}</td>
+                    <td>${tempUser.getDataDiNascita()}</td>
                     <td>
                         <a href="${tempLink}">Update</a>
                         |

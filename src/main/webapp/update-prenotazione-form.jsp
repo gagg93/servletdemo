@@ -37,11 +37,11 @@
                 </tr>
                 <tr>
                     <td><label> Data di inizio:</label></td>
-                    <td><input type="text" name="data_di_inizio" value="${THE_PRENOTAZIONE.data_di_inizio}"/></td>
+                    <td><input type="date" name="dataDiInizio" value="${THE_PRENOTAZIONE.dataDiInizio}" /></td>
                 </tr>
                 <tr>
                     <td><label> Data di fine:</label></td>
-                    <td><input type="text" name="data_di_fine" value="${THE_PRENOTAZIONE.data_di_fine}"/></td>
+                    <td><input type="date" name="dataDiFine" value="${THE_PRENOTAZIONE.dataDiFine}" /></td>
                 </tr>
                 <tr>
                     <td><label></label></td>

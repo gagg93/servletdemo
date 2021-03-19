@@ -16,8 +16,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @WebServlet("/UserControllerServlet")
@@ -31,7 +29,7 @@ public class UserControllerServlet extends HttpServlet  {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         try {
             String theCommand=req.getParameter("command");
             HttpSession session=req.getSession(false);
@@ -59,27 +57,13 @@ public class UserControllerServlet extends HttpServlet  {
     }
 
     private void researchUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<User> users = new ArrayList<>();
+        List<User> users;
 
         RequestDispatcher dispatcher= req.getRequestDispatcher("/user-list.jsp");
 
-
-        switch (req.getParameter("researchField")){
-            case "Username":{
-                User user=userDao.getUserByUsername(req.getParameter("key"));
-                users.add(user);
-            }break;
-            case "Nome":users=userDao.getUserByNome(req.getParameter("key"));break;
-            case "Cognome":users=userDao.getUserByCognome(req.getParameter("key"));break;
-            case "Data di nascita":users=userDao.getUserByData(req.getParameter("key"));break;
-            default:users=userDao.getUsers();
-        }
+        users=userDao.getUserByField(req.getParameter("key"),req.getParameter("researchField"));
         req.setAttribute("USER_LIST",users);
         dispatcher.forward(req,resp);
-    }
-
-    private void researchUserByUsername(HttpServletRequest req, HttpServletResponse resp) {
-
     }
 
     private void loadUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -87,7 +71,12 @@ public class UserControllerServlet extends HttpServlet  {
         User user;
         if (userId==null){
             HttpSession session=req.getSession(true);
-            user = userDao.getUserByUsername((String) session.getAttribute("username"));
+            userId=(String) session.getAttribute("username");
+            if(!userId.equals("admin")) {
+                user = userDao.getUserByUsername(userId);
+            }else{
+                user=new User();
+            }
         }else{
             user = userDao.getUser(userId);
         }
@@ -98,23 +87,7 @@ public class UserControllerServlet extends HttpServlet  {
 
 
 
-    private void updateUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        SimpleDateFormat data = new SimpleDateFormat();
-        User user=null;
-        try {
-            user = new User(req.getParameter("username"), req.getParameter("password"), req.getParameter("nome"), req.getParameter("cognome"), data.parse(req.getParameter("data")), false);
-            user.setId(Integer.parseInt(req.getParameter("userId")));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        if(user!=null&&user.getUsername().trim()!=null&&user.getNome().trim()!=null&&user.getCognome().trim()!=null&&user.getData_di_nascita()!=null) {
-            userDao.updateUser(user);
-        }else{
-            RequestDispatcher dispatcher= req.getRequestDispatcher("/error-page.jsp");
-            dispatcher.forward(req,resp);
-        }
-        listUsers(req,resp);
-    }
+
 
     private void deleteUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         SimpleDateFormat data = new SimpleDateFormat();
@@ -125,6 +98,24 @@ public class UserControllerServlet extends HttpServlet  {
 
     }
 
+    private void updateUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        SimpleDateFormat data = new SimpleDateFormat();
+        User user=null;
+        try {
+            user = new User(req.getParameter("username"), req.getParameter("password"), req.getParameter("nome"), req.getParameter("cognome"), data.parse(req.getParameter("data")), false);
+            user.setId(Integer.parseInt(req.getParameter("userId")));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if(user!=null&&user.getUsername().trim()!=null&&user.getNome().trim()!=null&&user.getCognome().trim()!=null&&user.getDataDiNascita()!=null) {
+            userDao.saveUser(user);
+        }else{
+            RequestDispatcher dispatcher= req.getRequestDispatcher("/error-page.jsp");
+            dispatcher.forward(req,resp);
+        }
+        listUsers(req,resp);
+    }
+
     private void addUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         SimpleDateFormat data = new SimpleDateFormat("dd-MM-yyyy");
         User user=null;
@@ -133,7 +124,7 @@ public class UserControllerServlet extends HttpServlet  {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        if(user!=null&&user.getUsername().trim()!=null&&user.getNome().trim()!=null&&user.getCognome().trim()!=null&&user.getData_di_nascita()!=null&&userDao.getUserByUsername(user.getUsername()) == null) {
+        if(user!=null&&user.getUsername().trim()!=null&&user.getNome().trim()!=null&&user.getCognome().trim()!=null&&user.getDataDiNascita()!=null&&userDao.getUserByUsername(user.getUsername()) == null) {
                 userDao.saveUser(user);
         }else{
             RequestDispatcher dispatcher= req.getRequestDispatcher("/error-page.jsp");

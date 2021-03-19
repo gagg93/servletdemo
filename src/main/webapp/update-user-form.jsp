@@ -47,7 +47,7 @@
             </tr>
             <tr>
                 <td><label> Data di nascita:</label></td>
-                <td><input type="text" name="data" value="${THE_USER.data_di_nascita}"/></td>
+                <td><input type="text" name="data" value="${THE_USER.dataDiNascita}"/></td>
             </tr>
             <tr>
                 <td><label></label></td>

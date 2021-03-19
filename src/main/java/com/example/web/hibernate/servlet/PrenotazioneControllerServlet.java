@@ -34,10 +34,9 @@ public class PrenotazioneControllerServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         try {
             String theCommand=req.getParameter("command");
-            HttpSession session=req.getSession(false);
             if (theCommand==null){
                 theCommand="LIST";
             }
@@ -46,7 +45,7 @@ public class PrenotazioneControllerServlet extends HttpServlet {
                 case "ADD":addPrenotazione(req,resp);break;
                 case "LOAD":loadPrenotazione(req,resp);break;
                 case "LOADADD":loadAddPrenotazione(req,resp);break;
-                case "UPDATE":updatePrenotazione(req,resp);break;
+                case "UPDATE":addPrenotazione(req,resp);break;
                 case "DELETE":deletePrenotazione(req,resp);break;
                 case "USERLIST":loadUserPrenotazioni(req,resp);break;
                 case "APPROVE": approvePrenotazione(req,resp);break;
@@ -63,26 +62,11 @@ public class PrenotazioneControllerServlet extends HttpServlet {
         }
     }
 
-    private void researchPrenotazioni(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, ParseException {
-        List<Prenotazione> prenotazioni=new ArrayList<>();
-        List<PrenotazioneRefactored> prenotazioneRefactoreds = new ArrayList<PrenotazioneRefactored>();
+    private void researchPrenotazioni(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        List<Prenotazione> prenotazioni;
+        List<PrenotazioneRefactored> prenotazioneRefactoreds = new ArrayList<>();
         HttpSession session=req.getSession();
-        switch(req.getParameter("researchField")){
-            case "Username":prenotazioni=prenotazioneDao.getPrenotazioniByUserId(userDao.getUserByUsername(req.getParameter("key")).getId());break;
-            case "Targa":{
-                Auto auto=autoDao.getAutoByTarga(req.getParameter("key"));
-                prenotazioni=prenotazioneDao.getPrenotazioniByTarga(auto);
-            }break;
-            case "Data di inizio": {
-                SimpleDateFormat data = new SimpleDateFormat("dd-MM-yyyy");
-                prenotazioni=prenotazioneDao.getPrenotazioniByDataDiInizio(data.parse(req.getParameter("key")));
-            }break;
-            case "Data di fine": {
-                SimpleDateFormat data = new SimpleDateFormat("dd-MM-yyyy");
-                prenotazioni=prenotazioneDao.getPrenotazioniByDataDiFine(data.parse(req.getParameter("key")));
-            }break;
-        }
-
+        prenotazioni=prenotazioneDao.getPrenotazioniByField(req.getParameter("key"),req.getParameter("researchField"));
         if(!prenotazioni.isEmpty()) {
             for (Prenotazione var :
                     prenotazioni) {
@@ -107,7 +91,7 @@ public class PrenotazioneControllerServlet extends HttpServlet {
         String prenotazioneId=req.getParameter("prenotazioneId");
         Prenotazione prenotazione=prenotazioneDao.getPrenotazione(prenotazioneId);
         prenotazione.setApprovata(false);
-        prenotazioneDao.updatePrenotazione(prenotazione);
+        prenotazioneDao.savePrenotazione(prenotazione);
         resp.sendRedirect("/PrenotazioneControllerServlet");
     }
 
@@ -115,7 +99,7 @@ public class PrenotazioneControllerServlet extends HttpServlet {
         String prenotazioneId=req.getParameter("prenotazioneId");
         Prenotazione prenotazione=prenotazioneDao.getPrenotazione(prenotazioneId);
         prenotazione.setApprovata(true);
-        prenotazioneDao.updatePrenotazione(prenotazione);
+        prenotazioneDao.savePrenotazione(prenotazione);
         resp.sendRedirect("/PrenotazioneControllerServlet");
     }
 
@@ -126,10 +110,6 @@ public class PrenotazioneControllerServlet extends HttpServlet {
                 prenotazioni) {
             PrenotazioneRefactored prenotazioneRefactored=new PrenotazioneRefactored(var);
             prenotazioneRefactoreds.add(prenotazioneRefactored);
-            /*int i=Integer.valueOf(req.getParameter("userId"));
-            if(var.getUser().getId()==i){
-                prenotazioneRefactoreds.add(prenotazioneRefactored);
-            }*/
         }
         req.setAttribute("PRENOTAZIONI_LIST",prenotazioneRefactoreds);
         RequestDispatcher dispatcher= req.getRequestDispatcher("/prenotazioni-list.jsp");
@@ -137,13 +117,19 @@ public class PrenotazioneControllerServlet extends HttpServlet {
     }
 
 
-    private void loadAddPrenotazione(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    private void loadAddPrenotazione(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, ParseException {
         HttpSession session=req.getSession();
         req.setAttribute("username",session.getAttribute("username"));
         String autoId= req.getParameter("autoId");
         Auto auto=autoDao.getAuto(autoId);
+        SimpleDateFormat str = new SimpleDateFormat("dd-MM-yyyy");
+        String data=str.format(new Date());
+        Date dt = str.parse(data);
+        Prenotazione prenotazione=new Prenotazione(dt,dt,auto,userDao.getUserByUsername((String) session.getAttribute("username")));
         req.setAttribute("targa", auto.getTarga());
-        RequestDispatcher dispatcher=req.getRequestDispatcher("/prenotazione-form.jsp");
+        PrenotazioneRefactored prenotazioneRefactored=new PrenotazioneRefactored(prenotazione);
+        req.setAttribute("THE_PRENOTAZIONE", prenotazioneRefactored);
+        RequestDispatcher dispatcher=req.getRequestDispatcher("/update-prenotazione-form.jsp");
         dispatcher.forward(req,resp);
         return;
     }
@@ -152,7 +138,8 @@ public class PrenotazioneControllerServlet extends HttpServlet {
         String prenotazioneId=req.getParameter("prenotazioneId");
         Prenotazione prenotazione= prenotazioneDao.getPrenotazione(prenotazioneId);
         Date now=new Date(System.currentTimeMillis()+172800000);
-        Date begin=prenotazione.getData_di_inizio();
+        Date begin=prenotazione.getDataDiInizio();
+        SimpleDateFormat data = new SimpleDateFormat("dd-MM-yyyy");
         if (now.after(begin)){
             RequestDispatcher dispatcher=req.getRequestDispatcher("/error-page.jsp");
             dispatcher.forward(req,resp);
@@ -165,39 +152,12 @@ public class PrenotazioneControllerServlet extends HttpServlet {
 
 
 
-    private void updatePrenotazione(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        Auto auto = autoDao.getAutoByTarga(req.getParameter("targa"));
-        User user = userDao.getUserByUsername(req.getParameter("username"));
-        SimpleDateFormat data = new SimpleDateFormat("dd-MM-yyyy");
-        Prenotazione prenotazione=null;
-        try {
-            prenotazione=new Prenotazione(data.parse(req.getParameter("data_di_inizio")),data.parse(req.getParameter("data_di_fine")), auto, user);
-            prenotazione.setApprovata(false);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        if(prenotazione!=null&&prenotazione.getData_di_fine()!=null&&prenotazione.getData_di_inizio()!=null&&prenotazione.getAuto()!=null&&prenotazione.getUser()!=null) {
-            Date now=new Date(System.currentTimeMillis()+172800000);
-            Date begin=prenotazione.getData_di_inizio();
-            if (now.after(begin)|| begin.after(prenotazione.getData_di_fine())){
-                RequestDispatcher dispatcher=req.getRequestDispatcher("/error-page.jsp");
-                dispatcher.forward(req,resp);
-                return;
-            }
-            prenotazioneDao.savePrenotazione(prenotazione);
-        }else{
-            RequestDispatcher dispatcher= req.getRequestDispatcher("/error-page.jsp");
-            dispatcher.forward(req,resp);
-        }
-        prenotazione.setId(Integer.parseInt(req.getParameter("prenotazioneId")));
-        prenotazioneDao.updatePrenotazione(prenotazione);
-        listPrenotazioni(req, resp);
-    }
+
 
     private void deletePrenotazione(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Prenotazione prenotazione= prenotazioneDao.getPrenotazione(req.getParameter("prenotazioneId"));
         Date now=new Date(System.currentTimeMillis()+172800000);
-        Date begin=prenotazione.getData_di_inizio();
+        Date begin=prenotazione.getDataDiInizio();
         if (now.after(begin)){
             RequestDispatcher dispatcher=req.getRequestDispatcher("/error-page.jsp");
             dispatcher.forward(req,resp);
@@ -210,32 +170,37 @@ public class PrenotazioneControllerServlet extends HttpServlet {
     private void addPrenotazione(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Auto auto=autoDao.getAutoByTarga(req.getParameter("targa"));
         User user=userDao.getUserByUsername(req.getParameter("username"));
-        SimpleDateFormat data = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat data = new SimpleDateFormat("yyyy-MM-dd");
+        String temp=req.getParameter("dataDiInizio");
         Prenotazione prenotazione=null;
         try {
-            prenotazione=new Prenotazione(data.parse(req.getParameter("data_di_inizio")),data.parse(req.getParameter("data_di_fine")), auto, user);
+            prenotazione=new Prenotazione(data.parse(temp),data.parse(req.getParameter("dataDiFine")), auto, user);
             prenotazione.setApprovata(false);
+            if(req.getParameter("prenotazioneId")!=null){
+                prenotazione.setId(Integer.parseInt(req.getParameter("prenotazioneId")));
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        if(prenotazione!=null&&prenotazione.getData_di_fine()!=null&&prenotazione.getData_di_inizio()!=null&&prenotazione.getAuto()!=null&&prenotazione.getUser()!=null) {
+        if(prenotazione!=null&&prenotazione.getDataDiFine()!=null&&prenotazione.getDataDiInizio()!=null&&prenotazione.getAuto()!=null&&prenotazione.getUser()!=null) {
             Date now=new Date(System.currentTimeMillis()+172800000);
-            Date begin=prenotazione.getData_di_inizio();
+            Date begin=prenotazione.getDataDiInizio();
             List<Prenotazione> prenotazioniAuto=prenotazioneDao.getPrenotazioniByTarga(prenotazione.getAuto());
             Boolean flag=false;
             for (Prenotazione var :
                     prenotazioniAuto) {
-                if ((prenotazione.getData_di_inizio().before(var.getData_di_fine()) && prenotazione.getData_di_inizio().after(var.getData_di_inizio()))
-                        || (prenotazione.getData_di_fine().before(var.getData_di_fine()) && prenotazione.getData_di_fine().after(var.getData_di_inizio()))
-                        || (prenotazione.getData_di_fine().equals(var.getData_di_fine()))
-                        || (prenotazione.getData_di_fine().equals(var.getData_di_inizio()))
-                        || (prenotazione.getData_di_inizio().equals(var.getData_di_fine()))
-                        || (prenotazione.getData_di_inizio().equals(var.getData_di_inizio()))
-                        || ((prenotazione.getData_di_inizio().before(var.getData_di_inizio()))&& (prenotazione.getData_di_fine().after(var.getData_di_fine())))) {
+                if (((prenotazione.getDataDiInizio().before(var.getDataDiFine()) && prenotazione.getDataDiInizio().after(var.getDataDiInizio()))
+                        || (prenotazione.getDataDiFine().before(var.getDataDiFine()) && prenotazione.getDataDiFine().after(var.getDataDiInizio()))
+                        || (prenotazione.getDataDiFine().equals(var.getDataDiFine()))
+                        || (prenotazione.getDataDiFine().equals(var.getDataDiInizio()))
+                        || (prenotazione.getDataDiInizio().equals(var.getDataDiFine()))
+                        || (prenotazione.getDataDiInizio().equals(var.getDataDiInizio()))
+                        || ((prenotazione.getDataDiInizio().before(var.getDataDiInizio()))&& (prenotazione.getDataDiFine().after(var.getDataDiFine()))))
+                        && (prenotazione.getId()!= var.getId())) {
                     flag=true;
                 }
             }
-            if (now.after(begin)|| begin.after(prenotazione.getData_di_fine()) || flag){
+            if (now.after(begin)|| begin.after(prenotazione.getDataDiFine()) || flag){
                 RequestDispatcher dispatcher=req.getRequestDispatcher("/error-page.jsp");
                 dispatcher.forward(req,resp);
                 return;
@@ -247,9 +212,6 @@ public class PrenotazioneControllerServlet extends HttpServlet {
             dispatcher.forward(req,resp);
         }
 
-        /*List<Prenotazione> prenotazioni;
-        prenotazioni=prenotazioneDao.getPrenotazioneByUserId(user.getId());
-        user.setPrenotazioni(prenotazioni);*/
         listPrenotazioni(req,resp);
     }
 
