@@ -1,4 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 
 <html>
 <head>
@@ -70,8 +72,8 @@
                 <tr>
                     <td>${tempPrenotazione.username}</td>
                     <td>${tempPrenotazione.targa}</td>
-                    <td>${tempPrenotazione.dataDiInizio}</td>
-                    <td>${tempPrenotazione.dataDiFine}</td>
+                    <td><fmt:formatDate value="${tempPrenotazione.dataDiInizio}" pattern="dd-MM-yyyy" /></td>
+                    <td><fmt:formatDate value="${tempPrenotazione.dataDiFine}" pattern="dd-MM-yyyy" /></td>
                     <td>${tempPrenotazione.approvata}</td>
                     <c:if test="${!admin}">
                     <td>

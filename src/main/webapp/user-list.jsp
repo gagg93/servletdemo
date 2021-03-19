@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
     <title>AppParco Auto</title>
@@ -64,7 +65,7 @@
                     <td>${tempUser.username}</td>
                     <td>${tempUser.getNome()}</td>
                     <td>${tempUser.getCognome()}</td>
-                    <td>${tempUser.getDataDiNascita()}</td>
+                    <td><fmt:formatDate value="${tempUser.getDataDiNascita()}" pattern="dd-MM-yyyy" /></td>
                     <td>
                         <a href="${tempLink}">Update</a>
                         |

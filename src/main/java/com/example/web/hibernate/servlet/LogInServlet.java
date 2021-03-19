@@ -61,10 +61,10 @@ public class LogInServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        SimpleDateFormat data = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat data = new SimpleDateFormat("dd/MM/yyyy");
         Date data1= null;
         try {
-            data1= data.parse("23-03-1993");
+            data1= data.parse("23/03/1993");
         } catch (ParseException e) {
             e.printStackTrace();
         }

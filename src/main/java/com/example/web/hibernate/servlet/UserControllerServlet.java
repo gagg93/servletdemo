@@ -44,7 +44,7 @@ public class UserControllerServlet extends HttpServlet  {
             }
             switch (theCommand){
                 case "LIST":listUsers(req,resp);break;
-                case "ADD":addUser(req,resp);break;
+                //case "ADD":addUser(req,resp);break;
                 case "LOAD":loadUser(req,resp);break;
                 case "UPDATE":updateUser(req,resp);break;
                 case "DELETE":deleteUser(req,resp);break;
@@ -99,7 +99,7 @@ public class UserControllerServlet extends HttpServlet  {
     }
 
     private void updateUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        SimpleDateFormat data = new SimpleDateFormat();
+        SimpleDateFormat data = new SimpleDateFormat("yyyy-MM-dd");
         User user=null;
         try {
             user = new User(req.getParameter("username"), req.getParameter("password"), req.getParameter("nome"), req.getParameter("cognome"), data.parse(req.getParameter("data")), false);
@@ -114,23 +114,6 @@ public class UserControllerServlet extends HttpServlet  {
             dispatcher.forward(req,resp);
         }
         listUsers(req,resp);
-    }
-
-    private void addUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        SimpleDateFormat data = new SimpleDateFormat("dd-MM-yyyy");
-        User user=null;
-        try {
-            user = new User(req.getParameter("username"), req.getParameter("password"), req.getParameter("nome"), req.getParameter("cognome"), data.parse(req.getParameter("data")), false);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        if(user!=null&&user.getUsername().trim()!=null&&user.getNome().trim()!=null&&user.getCognome().trim()!=null&&user.getDataDiNascita()!=null&&userDao.getUserByUsername(user.getUsername()) == null) {
-                userDao.saveUser(user);
-        }else{
-            RequestDispatcher dispatcher= req.getRequestDispatcher("/error-page.jsp");
-            dispatcher.forward(req,resp);
-        }
-        resp.sendRedirect("/UserControllerServlet");
     }
 
 
